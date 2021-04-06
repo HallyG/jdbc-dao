@@ -6,6 +6,13 @@ public class User {
   private String username;
   private String password;
 
+  public User() {}
+
+  public User(Long id, String email) {
+    this.id = id;
+    this.email = email;
+  }
+
   public Long getId() {
     return id;
   }
