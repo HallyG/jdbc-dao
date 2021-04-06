@@ -82,14 +82,14 @@ public class UserDAOImpl implements UserDAO {
       log.trace("SQL update affected {} rows", affectedRows);
 
       if (affectedRows == 0) {
-        throw new SQLException("Creating user failed, no rows affected.");
+        throw new DAOException("Creating user failed, no rows affected.");
       }
 
       try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
         if (generatedKeys.next()) {
           user.setId(generatedKeys.getLong(1));
         } else {
-          throw new SQLException("Creating user failed, no ID obtained.");
+          throw new DAOException("Creating user failed, no ID obtained.");
         }
       }
     } catch (SQLException e) {
@@ -114,7 +114,7 @@ public class UserDAOImpl implements UserDAO {
       log.trace("SQL update affected {} rows", affectedRows);
 
       if (affectedRows == 0) {
-        throw new SQLException("Updating user failed, no rows affected.");
+        throw new DAOException("Updating user failed, no rows affected.");
       }
     } catch (SQLException e) {
       throw new DAOException(e);
