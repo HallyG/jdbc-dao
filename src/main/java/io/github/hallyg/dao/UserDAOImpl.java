@@ -3,10 +3,8 @@ package io.github.hallyg.dao;
 import io.github.hallyg.dao.exception.DAOException;
 import io.github.hallyg.db.Database;
 import io.github.hallyg.domain.User;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +50,7 @@ public class UserDAOImpl implements UserDAO {
     try (Connection connection = database.getConnection();
         PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
       try (ResultSet resultSet = statement.executeQuery()) {
-        if (resultSet.next()) {
+        while (resultSet.next()) {
           users.add(createUserFromResultSet(resultSet));
         }
       }
