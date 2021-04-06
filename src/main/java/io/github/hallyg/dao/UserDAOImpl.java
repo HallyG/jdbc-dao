@@ -66,7 +66,7 @@ public class UserDAOImpl implements UserDAO {
 
   @Override
   public void create(User user) throws DAOException {
-    log.debug("Executing SQL query [{}]", INSERT_ONE);
+    log.debug("Executing SQL update [{}]", INSERT_ONE);
 
     try (Connection connection = database.getConnection();
         PreparedStatement statement =
@@ -74,6 +74,8 @@ public class UserDAOImpl implements UserDAO {
       statement.setString(1, user.getEmail());
 
       int affectedRows = statement.executeUpdate();
+      log.trace("SQL update affected {} rows", affectedRows);
+
       if (affectedRows == 0) {
         throw new SQLException("Creating user failed, no rows affected.");
       }
