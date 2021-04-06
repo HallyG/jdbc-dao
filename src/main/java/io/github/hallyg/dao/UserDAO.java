@@ -7,5 +7,8 @@ import java.util.Optional;
 
 public interface UserDAO {
   Optional<User> findOneById(Long id) throws DAOException;
+
   List<User> findAll() throws DAOException;
+
+  void create(User user) throws DAOException;
 }
