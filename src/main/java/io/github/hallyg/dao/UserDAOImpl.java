@@ -32,9 +32,9 @@ public class UserDAOImpl implements UserDAO {
         PreparedStatement statement = connection.prepareStatement(FIND_ONE_BY_ID)) {
       statement.setLong(1, id);
 
-      try (ResultSet resultSet = statement.executeQuery()) {
-        if (resultSet.next()) {
-          user = createUserFromResultSet(resultSet);
+      try (ResultSet rs = statement.executeQuery()) {
+        if (rs.next()) {
+          user = mapRow(rs);
         }
       }
     } catch (SQLException e) {
@@ -51,9 +51,10 @@ public class UserDAOImpl implements UserDAO {
     List<User> users = new ArrayList<>();
     try (Connection connection = database.getConnection();
         PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
-      try (ResultSet resultSet = statement.executeQuery()) {
-        while (resultSet.next()) {
-          users.add(createUserFromResultSet(resultSet));
+
+      try (ResultSet rs = statement.executeQuery()) {
+        while (rs.next()) {
+          users.add(mapRow(rs));
         }
       }
     } catch (SQLException e) {
@@ -73,7 +74,6 @@ public class UserDAOImpl implements UserDAO {
       statement.setString(1, user.getEmail());
 
       int affectedRows = statement.executeUpdate();
-
       if (affectedRows == 0) {
         throw new SQLException("Creating user failed, no rows affected.");
       }
@@ -90,11 +90,7 @@ public class UserDAOImpl implements UserDAO {
     }
   }
 
-  private User createUserFromResultSet(final ResultSet rs) throws SQLException {
-    final User user = new User();
-    user.setId(rs.getLong("user_id"));
-    user.setEmail(rs.getString("email"));
-
-    return user;
+  private User mapRow(ResultSet rs) throws SQLException {
+    return new User(rs.getLong("user_id"), rs.getString("email"));
   }
 }
