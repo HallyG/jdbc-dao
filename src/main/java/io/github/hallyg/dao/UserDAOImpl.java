@@ -16,6 +16,7 @@ public class UserDAOImpl implements UserDAO {
   private static final String FIND_ONE_BY_ID = "select * from users where user_id=?";
   private static final String FIND_ALL = "select * from users";
   private static final String INSERT_ONE = "insert into users (email) values (?)";
+  private static final String UPDATE_ONE = "update users set email=? where user_id=?";
 
   private Database database;
 
@@ -90,6 +91,30 @@ public class UserDAOImpl implements UserDAO {
         } else {
           throw new SQLException("Creating user failed, no ID obtained.");
         }
+      }
+    } catch (SQLException e) {
+      throw new DAOException(e);
+    }
+  }
+
+  @Override
+  public void update(User user) throws DAOException {
+    if (user.getId() == null) {
+      throw new IllegalArgumentException("User is not created yet, the user ID is null.");
+    }
+
+    log.debug("Executing SQL update [{}]", UPDATE_ONE);
+
+    try (Connection connection = database.getConnection();
+        PreparedStatement statement = connection.prepareStatement(UPDATE_ONE)) {
+      statement.setString(1, user.getEmail());
+      statement.setLong(2, user.getId());
+
+      int affectedRows = statement.executeUpdate();
+      log.trace("SQL update affected {} rows", affectedRows);
+
+      if (affectedRows == 0) {
+        throw new SQLException("Updating user failed, no rows affected.");
       }
     } catch (SQLException e) {
       throw new DAOException(e);

@@ -11,4 +11,6 @@ public interface UserDAO {
   List<User> findAll() throws DAOException;
 
   void create(User user) throws DAOException;
+
+  void update(User user) throws DAOException;
 }
