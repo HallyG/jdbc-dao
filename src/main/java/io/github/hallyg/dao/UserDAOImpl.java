@@ -25,8 +25,9 @@ public class UserDAOImpl implements UserDAO {
 
   @Override
   public Optional<User> findOneById(Long id) throws DAOException {
-    User user = null;
+    log.debug("Executing SQL query [{}]", FIND_ONE_BY_ID);
 
+    User user = null;
     try (Connection connection = database.getConnection();
         PreparedStatement statement = connection.prepareStatement(FIND_ONE_BY_ID)) {
       statement.setLong(1, id);
@@ -45,8 +46,9 @@ public class UserDAOImpl implements UserDAO {
 
   @Override
   public List<User> findAll() throws DAOException {
-    List<User> users = new ArrayList<>();
+    log.debug("Executing SQL query [{}]", FIND_ALL);
 
+    List<User> users = new ArrayList<>();
     try (Connection connection = database.getConnection();
         PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
       try (ResultSet resultSet = statement.executeQuery()) {
@@ -63,6 +65,8 @@ public class UserDAOImpl implements UserDAO {
 
   @Override
   public void create(User user) throws DAOException {
+    log.debug("Executing SQL query [{}]", INSERT_ONE);
+
     try (Connection connection = database.getConnection();
         PreparedStatement statement =
             connection.prepareStatement(INSERT_ONE, Statement.RETURN_GENERATED_KEYS)) {
