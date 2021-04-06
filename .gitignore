@@ -1,0 +1,10 @@
+# IntelliJ #
+target
+.idea
+*.iml
+
+# Build Directory #
+!/**/src/**/bin
+!/**/src/**/build
+bin
+build
