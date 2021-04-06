@@ -66,6 +66,10 @@ public class UserDAOImpl implements UserDAO {
 
   @Override
   public void create(User user) throws DAOException {
+    if (user.getId() != null) {
+      throw new IllegalArgumentException("User is already created, the user ID is not null.");
+    }
+
     log.debug("Executing SQL update [{}]", INSERT_ONE);
 
     try (Connection connection = database.getConnection();
