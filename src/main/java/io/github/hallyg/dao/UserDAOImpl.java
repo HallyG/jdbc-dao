@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +17,7 @@ public class UserDAOImpl implements UserDAO {
   private static final Logger log = LogManager.getLogger(UserDAOImpl.class);
 
   private static final String FIND_ONE_BY_ID = "select * from users where user_id=?";
+  private static final String FIND_ALL = "select * from users";
 
   private Database database;
 
@@ -40,6 +43,24 @@ public class UserDAOImpl implements UserDAO {
     }
 
     return Optional.ofNullable(user);
+  }
+
+  @Override
+  public List<User> findAll() throws DAOException {
+    List<User> users = new ArrayList<>();
+
+    try (Connection connection = database.getConnection();
+        PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
+      try (ResultSet resultSet = statement.executeQuery()) {
+        if (resultSet.next()) {
+          users.add(createUserFromResultSet(resultSet));
+        }
+      }
+    } catch (SQLException e) {
+      throw new DAOException(e);
+    }
+
+    return users;
   }
 
   private User createUserFromResultSet(final ResultSet rs) throws SQLException {
