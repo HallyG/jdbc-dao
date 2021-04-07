@@ -17,6 +17,7 @@ public class UserDAOImpl implements UserDAO {
   private static final String FIND_ALL = "select * from users";
   private static final String INSERT_ONE = "insert into users (email) values (?)";
   private static final String UPDATE_ONE = "update users set email=? where user_id=?";
+  private static final String DELETE_ONE = "delete from users where user_id=?";
 
   private Database database;
 
@@ -115,6 +116,31 @@ public class UserDAOImpl implements UserDAO {
 
       if (affectedRows == 0) {
         throw new DAOException("Updating user failed, no rows affected.");
+      }
+    } catch (SQLException e) {
+      throw new DAOException(e);
+    }
+  }
+
+  @Override
+  public void delete(User user) throws DAOException {
+    if (user.getId() == null) {
+      throw new IllegalArgumentException("User is not created yet, the user ID is null.");
+    }
+
+    log.debug("Executing SQL update [{}]", DELETE_ONE);
+
+    try (Connection connection = database.getConnection();
+         PreparedStatement statement = connection.prepareStatement(DELETE_ONE)) {
+      statement.setLong(1, user.getId());
+
+      int affectedRows = statement.executeUpdate();
+      log.trace("SQL update affected {} rows", affectedRows);
+
+      if (affectedRows == 0) {
+        throw new DAOException("Deleting user failed, no rows affected.");
+      } else {
+        user.setId(null);
       }
     } catch (SQLException e) {
       throw new DAOException(e);
