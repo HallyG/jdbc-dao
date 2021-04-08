@@ -11,8 +11,6 @@ public class SQLiteDatabase implements Database {
   private SQLiteDataSource dataSource;
 
   public SQLiteDatabase(final String url) {
-    log.info("Creating SQLiteDataSource with url={}", url);
-
     dataSource = new SQLiteDataSource();
     dataSource.setUrl(url);
   }
