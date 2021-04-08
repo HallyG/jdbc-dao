@@ -5,7 +5,7 @@ import io.github.hallyg.domain.User;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserDAO {
+public interface UserDao {
   Optional<User> findOneById(Long id) throws DAOException;
 
   List<User> findAll() throws DAOException;

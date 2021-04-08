@@ -14,7 +14,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class UserDAOImpl implements UserDAO {
+public class UserDAOImpl implements UserDao {
   private static final Logger log = LogManager.getLogger(UserDAOImpl.class);
 
   private static final String FIND_ONE_BY_ID = "select * from users where user_id=?";
