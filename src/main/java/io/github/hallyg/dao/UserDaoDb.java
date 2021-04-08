@@ -43,8 +43,8 @@ public class UserDaoDb implements UserDao {
           user = mapRow(rs);
         }
       }
-    } catch (SQLException e) {
-      throw new DAOException(e);
+    } catch (SQLException ex) {
+      throw new DAOException(ex.getMessage(), ex);
     }
 
     return Optional.ofNullable(user);
@@ -63,8 +63,8 @@ public class UserDaoDb implements UserDao {
           users.add(mapRow(rs));
         }
       }
-    } catch (SQLException e) {
-      throw new DAOException(e);
+    } catch (SQLException ex) {
+      throw new DAOException(ex.getMessage(), ex);
     }
 
     return users;
@@ -97,8 +97,8 @@ public class UserDaoDb implements UserDao {
           throw new DAOException("Creating user failed, no ID obtained.");
         }
       }
-    } catch (SQLException e) {
-      throw new DAOException(e);
+    } catch (SQLException ex) {
+      throw new DAOException(ex.getMessage(), ex);
     }
   }
 
@@ -121,8 +121,8 @@ public class UserDaoDb implements UserDao {
       if (affectedRows == 0) {
         throw new DAOException("Updating user failed, no rows affected.");
       }
-    } catch (SQLException e) {
-      throw new DAOException(e);
+    } catch (SQLException ex) {
+      throw new DAOException(ex.getMessage(), ex);
     }
   }
 
@@ -146,8 +146,8 @@ public class UserDaoDb implements UserDao {
       } else {
         user.setId(null);
       }
-    } catch (SQLException e) {
-      throw new DAOException(e);
+    } catch (SQLException ex) {
+      throw new DAOException(ex.getMessage(), ex);
     }
   }
 
