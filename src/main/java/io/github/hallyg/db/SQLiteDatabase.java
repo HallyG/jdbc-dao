@@ -21,4 +21,9 @@ public class SQLiteDatabase implements Database {
   public Connection getConnection() throws SQLException {
     return dataSource.getConnection();
   }
+
+  @Override
+  public Connection getConnection(String username, String password) throws SQLException {
+    return dataSource.getConnection(username, password);
+  }
 }
