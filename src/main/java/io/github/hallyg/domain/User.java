@@ -3,10 +3,6 @@ package io.github.hallyg.domain;
 public class User {
   private Long id;
   private String email;
-  private String username;
-  private String password;
-
-  public User() {}
 
   public User(Long id, String email) {
     this.id = id;
