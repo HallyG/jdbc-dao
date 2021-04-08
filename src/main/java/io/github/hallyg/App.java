@@ -1,5 +1,6 @@
 package io.github.hallyg;
 
+import io.github.hallyg.dao.UserDao;
 import io.github.hallyg.dao.UserDaoDb;
 import io.github.hallyg.db.Database;
 import io.github.hallyg.db.SQLiteDatabase;
@@ -18,7 +19,7 @@ public class App {
     Database database = createDatabase();
     createSchema(database);
 
-    UserDaoDb userDao = new UserDaoDb(database);
+    UserDao userDao = new UserDaoDb(database);
     log.info(userDao.findAll().stream().map(Object::toString).collect(Collectors.joining("\n")));
   }
 
