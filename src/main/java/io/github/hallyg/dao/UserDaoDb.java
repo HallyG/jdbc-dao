@@ -31,6 +31,10 @@ public class UserDaoDb implements UserDao {
 
   @Override
   public Optional<User> findOneById(Long id) throws DaoException {
+    if (id == null) {
+      throw new IllegalArgumentException("The given id must not be null.");
+    }
+
     log.debug("Executing SQL query [{}]", FIND_ONE_BY_ID);
 
     User user = null;
@@ -72,8 +76,8 @@ public class UserDaoDb implements UserDao {
 
   @Override
   public void create(User user) throws DaoException {
-    if (user.getId() != null) {
-      throw new IllegalArgumentException("User is already created, the user ID is not null.");
+    if (user == null) {
+      throw new IllegalArgumentException("The given user must not be null.");
     }
 
     log.debug("Executing SQL update [{}]", INSERT_ONE);
@@ -104,8 +108,8 @@ public class UserDaoDb implements UserDao {
 
   @Override
   public void update(User user) throws DaoException {
-    if (user.getId() == null) {
-      throw new IllegalArgumentException("User is not created yet, the user ID is null.");
+    if (user == null) {
+      throw new IllegalArgumentException("The given user must not be null.");
     }
 
     log.debug("Executing SQL update [{}]", UPDATE_ONE);
@@ -127,9 +131,9 @@ public class UserDaoDb implements UserDao {
   }
 
   @Override
-  public void delete(User user) throws DaoException {
-    if (user.getId() == null) {
-      throw new IllegalArgumentException("User is not created yet, the user ID is null.");
+  public void delete(User user) {
+    if (user == null) {
+      throw new IllegalArgumentException("The given user must not be null.");
     }
 
     log.debug("Executing SQL update [{}]", DELETE_ONE);
