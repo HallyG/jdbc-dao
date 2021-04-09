@@ -1,4 +1,4 @@
-package io.github.hallyg.dao;
+package io.github.hallyg.dao.user;
 
 import io.github.hallyg.dao.exception.PersistentException;
 import io.github.hallyg.dao.exception.UserEmptyResultDataException;
