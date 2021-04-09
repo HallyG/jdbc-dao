@@ -4,10 +4,11 @@ import io.github.hallyg.dao.UserDao;
 import io.github.hallyg.dao.UserDaoDb;
 import io.github.hallyg.db.Database;
 import io.github.hallyg.db.SQLiteDatabase;
+import io.github.hallyg.domain.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.stream.Collectors;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,12 +16,17 @@ public class App {
   private static final Logger log = LogManager.getLogger(App.class);
   private static final String DB_URL = "jdbc:sqlite:data/users.db";
 
-  public static void main(String[] args) throws SQLException {
+  public static void main(String[] args) {
     Database database = createDatabase();
-    createSchema(database);
+
+    try {
+      createSchema(database);
+    } catch (SQLException ex) {
+    }
 
     UserDao userDao = new UserDaoDb(database);
-    log.info(userDao.findAll().stream().map(Object::toString).collect(Collectors.joining("\n")));
+    List<User> users = userDao.findAll();
+    log.info(users);
   }
 
   private static Database createDatabase() {
