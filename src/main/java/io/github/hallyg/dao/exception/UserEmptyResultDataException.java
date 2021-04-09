@@ -1,6 +1,6 @@
 package io.github.hallyg.dao.exception;
 
-public class UserEmptyResultDataException extends DaoException {
+public class UserEmptyResultDataException extends PersistentException {
   public UserEmptyResultDataException(String message) {
     super(message);
   }

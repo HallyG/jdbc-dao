@@ -1,6 +1,6 @@
 package io.github.hallyg.dao;
 
-import io.github.hallyg.dao.exception.DaoException;
+import io.github.hallyg.dao.exception.PersistentException;
 import io.github.hallyg.dao.exception.UserEmptyResultDataException;
 import io.github.hallyg.dao.exception.UserExistsException;
 import io.github.hallyg.dao.exception.UserNotFoundException;
@@ -33,7 +33,7 @@ public class UserDaoDb implements UserDao {
   }
 
   @Override
-  public Optional<User> findOneById(Long id) throws DaoException {
+  public Optional<User> findOneById(Long id) throws PersistentException {
     if (id == null) {
       throw new IllegalArgumentException("The given id must not be null.");
     }
@@ -51,14 +51,14 @@ public class UserDaoDb implements UserDao {
         }
       }
     } catch (SQLException ex) {
-      throw new DaoException(ex.getMessage(), ex);
+      throw new PersistentException(ex.getMessage(), ex);
     }
 
     return Optional.ofNullable(user);
   }
 
   @Override
-  public List<User> findAll() throws DaoException {
+  public List<User> findAll() throws PersistentException {
     log.debug("Executing SQL query [{}]", FIND_ALL);
 
     List<User> users = new ArrayList<>();
@@ -71,14 +71,14 @@ public class UserDaoDb implements UserDao {
         }
       }
     } catch (SQLException ex) {
-      throw new DaoException(ex.getMessage(), ex);
+      throw new PersistentException(ex.getMessage(), ex);
     }
 
     return users;
   }
 
   @Override
-  public void create(User user) throws DaoException {
+  public void create(User user) throws PersistentException {
     if (user == null) {
       throw new IllegalArgumentException("The given user must not be null.");
     }
@@ -108,12 +108,12 @@ public class UserDaoDb implements UserDao {
         }
       }
     } catch (SQLException ex) {
-      throw new DaoException(ex.getMessage(), ex);
+      throw new PersistentException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  public void update(User user) throws DaoException {
+  public void update(User user) throws PersistentException {
     if (user == null) {
       throw new IllegalArgumentException("The given user must not be null.");
     }
@@ -137,12 +137,12 @@ public class UserDaoDb implements UserDao {
         throw new UserEmptyResultDataException("");
       }
     } catch (SQLException ex) {
-      throw new DaoException(ex.getMessage(), ex);
+      throw new PersistentException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  public void delete(User user) throws DaoException {
+  public void delete(User user) throws PersistentException {
     if (user == null) {
       throw new IllegalArgumentException("The given user must not be null.");
     }
@@ -160,7 +160,7 @@ public class UserDaoDb implements UserDao {
         throw new UserEmptyResultDataException("");
       }
     } catch (SQLException ex) {
-      throw new DaoException(ex.getMessage(), ex);
+      throw new PersistentException(ex.getMessage(), ex);
     }
   }
 

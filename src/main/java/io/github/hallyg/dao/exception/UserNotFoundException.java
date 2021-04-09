@@ -1,6 +1,6 @@
 package io.github.hallyg.dao.exception;
 
-public class UserNotFoundException extends DaoException {
+public class UserNotFoundException extends PersistentException {
   public UserNotFoundException(String message) {
     super(message);
   }

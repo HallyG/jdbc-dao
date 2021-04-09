@@ -1,6 +1,6 @@
 package io.github.hallyg.dao.exception;
 
-public class UserExistsException extends DaoException {
+public class UserExistsException extends PersistentException {
   public UserExistsException(String message) {
     super(message);
   }
