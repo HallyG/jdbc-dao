@@ -1,6 +1,6 @@
 package io.github.hallyg.dao;
 
-import io.github.hallyg.dao.exception.DAOException;
+import io.github.hallyg.dao.exception.DaoException;
 import io.github.hallyg.db.Database;
 import io.github.hallyg.domain.User;
 import java.sql.Connection;
@@ -30,7 +30,7 @@ public class UserDaoDb implements UserDao {
   }
 
   @Override
-  public Optional<User> findOneById(Long id) throws DAOException {
+  public Optional<User> findOneById(Long id) throws DaoException {
     log.debug("Executing SQL query [{}]", FIND_ONE_BY_ID);
 
     User user = null;
@@ -44,14 +44,14 @@ public class UserDaoDb implements UserDao {
         }
       }
     } catch (SQLException ex) {
-      throw new DAOException(ex.getMessage(), ex);
+      throw new DaoException(ex.getMessage(), ex);
     }
 
     return Optional.ofNullable(user);
   }
 
   @Override
-  public List<User> findAll() throws DAOException {
+  public List<User> findAll() throws DaoException {
     log.debug("Executing SQL query [{}]", FIND_ALL);
 
     List<User> users = new ArrayList<>();
@@ -64,14 +64,14 @@ public class UserDaoDb implements UserDao {
         }
       }
     } catch (SQLException ex) {
-      throw new DAOException(ex.getMessage(), ex);
+      throw new DaoException(ex.getMessage(), ex);
     }
 
     return users;
   }
 
   @Override
-  public void create(User user) throws DAOException {
+  public void create(User user) throws DaoException {
     if (user.getId() != null) {
       throw new IllegalArgumentException("User is already created, the user ID is not null.");
     }
@@ -87,23 +87,23 @@ public class UserDaoDb implements UserDao {
       log.trace("SQL update affected {} rows", affectedRows);
 
       if (affectedRows == 0) {
-        throw new DAOException("Creating user failed, no rows affected.");
+        throw new DaoException("Creating user failed, no rows affected.");
       }
 
       try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
         if (generatedKeys.next()) {
           user.setId(generatedKeys.getLong(1));
         } else {
-          throw new DAOException("Creating user failed, no ID obtained.");
+          throw new DaoException("Creating user failed, no ID obtained.");
         }
       }
     } catch (SQLException ex) {
-      throw new DAOException(ex.getMessage(), ex);
+      throw new DaoException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  public void update(User user) throws DAOException {
+  public void update(User user) throws DaoException {
     if (user.getId() == null) {
       throw new IllegalArgumentException("User is not created yet, the user ID is null.");
     }
@@ -119,15 +119,15 @@ public class UserDaoDb implements UserDao {
       log.trace("SQL update affected {} rows", affectedRows);
 
       if (affectedRows == 0) {
-        throw new DAOException("Updating user failed, no rows affected.");
+        throw new DaoException("Updating user failed, no rows affected.");
       }
     } catch (SQLException ex) {
-      throw new DAOException(ex.getMessage(), ex);
+      throw new DaoException(ex.getMessage(), ex);
     }
   }
 
   @Override
-  public void delete(User user) throws DAOException {
+  public void delete(User user) throws DaoException {
     if (user.getId() == null) {
       throw new IllegalArgumentException("User is not created yet, the user ID is null.");
     }
@@ -142,12 +142,12 @@ public class UserDaoDb implements UserDao {
       log.trace("SQL update affected {} rows", affectedRows);
 
       if (affectedRows == 0) {
-        throw new DAOException("Deleting user failed, no rows affected.");
+        throw new DaoException("Deleting user failed, no rows affected.");
       } else {
         user.setId(null);
       }
     } catch (SQLException ex) {
-      throw new DAOException(ex.getMessage(), ex);
+      throw new DaoException(ex.getMessage(), ex);
     }
   }
 
