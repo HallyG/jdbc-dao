@@ -1,6 +1,6 @@
 package io.github.hallyg.dao.exception;
 
-public class DaoException extends RuntimeException {
+public class DaoException extends RuntimeException { //PersistentException
   public DaoException(String message) {
     super(message);
   }
