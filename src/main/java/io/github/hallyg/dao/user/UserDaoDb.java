@@ -20,11 +20,11 @@ import org.apache.logging.log4j.Logger;
 public class UserDaoDb implements UserDao {
   private static final Logger log = LogManager.getLogger(UserDaoDb.class);
 
-  private static final String FIND_ONE_BY_ID = "select * from users where user_id=?";
-  private static final String FIND_ALL = "select * from users";
-  private static final String INSERT_ONE = "insert into users (email) values (?)";
-  private static final String UPDATE_ONE = "update users set email=? where user_id=?";
-  private static final String DELETE_ONE = "delete from users where user_id=?";
+  private static final String SQL_FIND_ONE_BY_ID = "select * from users where user_id=?";
+  private static final String SQL_FIND_ALL = "select * from users";
+  private static final String SQL_INSERT_ONE = "insert into users (email) values (?)";
+  private static final String SQL_UPDATE_ONE = "update users set email=? where user_id=?";
+  private static final String SQL_DELETE_ONE = "delete from users where user_id=?";
 
   private Database database;
 
@@ -38,11 +38,11 @@ public class UserDaoDb implements UserDao {
       throw new IllegalArgumentException("The given id must not be null.");
     }
 
-    log.debug("Executing SQL query [{}]", FIND_ONE_BY_ID);
+    log.debug("Executing SQL query [{}]", SQL_FIND_ONE_BY_ID);
 
     User user = null;
     try (Connection connection = database.getConnection();
-        PreparedStatement statement = connection.prepareStatement(FIND_ONE_BY_ID)) {
+        PreparedStatement statement = connection.prepareStatement(SQL_FIND_ONE_BY_ID)) {
       statement.setLong(1, id);
 
       try (ResultSet rs = statement.executeQuery()) {
@@ -59,11 +59,11 @@ public class UserDaoDb implements UserDao {
 
   @Override
   public List<User> findAll() throws PersistentException {
-    log.debug("Executing SQL query [{}]", FIND_ALL);
+    log.debug("Executing SQL query [{}]", SQL_FIND_ALL);
 
     List<User> users = new ArrayList<>();
     try (Connection connection = database.getConnection();
-        PreparedStatement statement = connection.prepareStatement(FIND_ALL)) {
+        PreparedStatement statement = connection.prepareStatement(SQL_FIND_ALL)) {
 
       try (ResultSet rs = statement.executeQuery()) {
         while (rs.next()) {
@@ -88,11 +88,11 @@ public class UserDaoDb implements UserDao {
       throw new UserExistsException(String.format("User with id=%s already exists.", user.getId()));
     }
 
-    log.debug("Executing SQL update [{}]", INSERT_ONE);
+    log.debug("Executing SQL update [{}]", SQL_INSERT_ONE);
 
     try (Connection connection = database.getConnection();
         PreparedStatement statement =
-            connection.prepareStatement(INSERT_ONE, Statement.RETURN_GENERATED_KEYS)) {
+            connection.prepareStatement(SQL_INSERT_ONE, Statement.RETURN_GENERATED_KEYS)) {
       statement.setString(1, user.getEmail());
 
       int affectedRows = statement.executeUpdate();
@@ -123,10 +123,10 @@ public class UserDaoDb implements UserDao {
       throw new UserNotFoundException(String.format("No user with id=%s exists.", user.getId()));
     }
 
-    log.debug("Executing SQL update [{}]", UPDATE_ONE);
+    log.debug("Executing SQL update [{}]", SQL_UPDATE_ONE);
 
     try (Connection connection = database.getConnection();
-        PreparedStatement statement = connection.prepareStatement(UPDATE_ONE)) {
+        PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_ONE)) {
       statement.setString(1, user.getEmail());
       statement.setLong(2, user.getId());
 
@@ -147,10 +147,10 @@ public class UserDaoDb implements UserDao {
       throw new IllegalArgumentException("The given user must not be null.");
     }
 
-    log.debug("Executing SQL update [{}]", DELETE_ONE);
+    log.debug("Executing SQL update [{}]", SQL_DELETE_ONE);
 
     try (Connection connection = database.getConnection();
-        PreparedStatement statement = connection.prepareStatement(DELETE_ONE)) {
+        PreparedStatement statement = connection.prepareStatement(SQL_DELETE_ONE)) {
       statement.setLong(1, user.getId());
 
       int affectedRows = statement.executeUpdate();
