@@ -4,13 +4,10 @@ import io.github.hallyg.dao.exception.PersistentException;
 import io.github.hallyg.dao.exception.UserEmptyResultDataException;
 import io.github.hallyg.dao.exception.UserExistsException;
 import io.github.hallyg.dao.exception.UserNotFoundException;
-import io.github.hallyg.db.Database;
+import io.github.hallyg.dao.util.QueryRunner;
 import io.github.hallyg.domain.User;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,10 +23,10 @@ public class UserDaoDb implements UserDao {
   private static final String SQL_UPDATE_ONE = "update users set email=? where user_id=?";
   private static final String SQL_DELETE_ONE = "delete from users where user_id=?";
 
-  private Database database;
+  private QueryRunner queryRunner;
 
-  public UserDaoDb(Database database) {
-    this.database = database;
+  public UserDaoDb(QueryRunner queryRunner) {
+    this.queryRunner = queryRunner;
   }
 
   @Override
@@ -40,41 +37,23 @@ public class UserDaoDb implements UserDao {
 
     log.debug("Executing SQL query [{}]", SQL_FIND_ONE_BY_ID);
 
-    User user = null;
-    try (Connection connection = database.getConnection();
-        PreparedStatement statement = connection.prepareStatement(SQL_FIND_ONE_BY_ID)) {
-      statement.setLong(1, id);
-
-      try (ResultSet rs = statement.executeQuery()) {
-        if (rs.next()) {
-          user = mapRow(rs);
-        }
-      }
+    try {
+      User user = queryRunner.query(SQL_FIND_ONE_BY_ID, this::resultSetToUser, id);
+      return Optional.ofNullable(user);
     } catch (SQLException ex) {
       throw new PersistentException(ex.getMessage(), ex);
     }
-
-    return Optional.ofNullable(user);
   }
 
   @Override
   public List<User> findAll() throws PersistentException {
     log.debug("Executing SQL query [{}]", SQL_FIND_ALL);
 
-    List<User> users = new ArrayList<>();
-    try (Connection connection = database.getConnection();
-        PreparedStatement statement = connection.prepareStatement(SQL_FIND_ALL)) {
-
-      try (ResultSet rs = statement.executeQuery()) {
-        while (rs.next()) {
-          users.add(mapRow(rs));
-        }
-      }
+    try {
+      return queryRunner.query(SQL_FIND_ALL, this::resultSetToUserList);
     } catch (SQLException ex) {
       throw new PersistentException(ex.getMessage(), ex);
     }
-
-    return users;
   }
 
   @Override
@@ -84,28 +63,17 @@ public class UserDaoDb implements UserDao {
     }
 
     if (findOneById(user.getId()).isPresent()) {
-      log.warn(String.format("User with id=%s already exists.", user.getId()));
       throw new UserExistsException(String.format("User with id=%s already exists.", user.getId()));
     }
 
     log.debug("Executing SQL update [{}]", SQL_INSERT_ONE);
 
-    try (Connection connection = database.getConnection();
-        PreparedStatement statement =
-            connection.prepareStatement(SQL_INSERT_ONE, Statement.RETURN_GENERATED_KEYS)) {
-      statement.setString(1, user.getEmail());
-
-      int affectedRows = statement.executeUpdate();
-      log.trace("SQL update affected {} rows", affectedRows);
-
-      if (affectedRows == 0) {
+    try {
+      Long userId = queryRunner.insert(SQL_INSERT_ONE, this::resultSetToId, user.getEmail());
+      if (userId != null) {
+        user.setId(userId);
+      } else {
         throw new UserEmptyResultDataException("");
-      }
-
-      try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-        if (generatedKeys.next()) {
-          user.setId(generatedKeys.getLong(1));
-        }
       }
     } catch (SQLException ex) {
       throw new PersistentException(ex.getMessage(), ex);
@@ -119,19 +87,14 @@ public class UserDaoDb implements UserDao {
     }
 
     if (!findOneById(user.getId()).isPresent()) {
-      log.warn(String.format("No user with id=%s exists.", user.getId()));
       throw new UserNotFoundException(String.format("No user with id=%s exists.", user.getId()));
     }
 
     log.debug("Executing SQL update [{}]", SQL_UPDATE_ONE);
 
-    try (Connection connection = database.getConnection();
-        PreparedStatement statement = connection.prepareStatement(SQL_UPDATE_ONE)) {
-      statement.setString(1, user.getEmail());
-      statement.setLong(2, user.getId());
-
-      int affectedRows = statement.executeUpdate();
-      log.trace("SQL update affected {} rows", affectedRows);
+    try {
+      int affectedRows = queryRunner.update(SQL_UPDATE_ONE, user.getEmail(), user.getId());
+      log.debug("SQL update affected {} rows", affectedRows);
 
       if (affectedRows == 0) {
         throw new UserEmptyResultDataException("");
@@ -149,12 +112,9 @@ public class UserDaoDb implements UserDao {
 
     log.debug("Executing SQL update [{}]", SQL_DELETE_ONE);
 
-    try (Connection connection = database.getConnection();
-        PreparedStatement statement = connection.prepareStatement(SQL_DELETE_ONE)) {
-      statement.setLong(1, user.getId());
-
-      int affectedRows = statement.executeUpdate();
-      log.trace("SQL update affected {} rows", affectedRows);
+    try {
+      int affectedRows = queryRunner.update(SQL_DELETE_ONE, user.getId());
+      log.debug("SQL update affected {} rows", affectedRows);
 
       if (affectedRows == 0) {
         throw new UserEmptyResultDataException("");
@@ -164,7 +124,22 @@ public class UserDaoDb implements UserDao {
     }
   }
 
-  private User mapRow(ResultSet rs) throws SQLException {
-    return new User(rs.getLong("user_id"), rs.getString("email"));
+  private List<User> resultSetToUserList(final ResultSet rs) throws SQLException {
+    List<User> userList = new ArrayList<>();
+
+    while (rs.next()) {
+      User user = new User(rs.getLong("user_id"), rs.getString("email"));
+      userList.add(user);
+    }
+
+    return userList;
+  }
+
+  private User resultSetToUser(final ResultSet rs) throws SQLException {
+    return rs.next() ? new User(rs.getLong("user_id"), rs.getString("email")) : null;
+  }
+
+  private Long resultSetToId(final ResultSet rs) throws SQLException {
+    return rs.next() ? rs.getLong(1) : null;
   }
 }
